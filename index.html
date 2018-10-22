@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Roadway Edits Tracking</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.24/dijit/themes/tundra/tundra.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.24/esri/css/esri.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<style>
+	  html, body, {
+	    height: 100%;
+	    padding: 0;
+	    margin: 0;
+	  }
+
+	/* SIDE NAVS******************************************************************* */
+	.sidenav {
+	    height: 100%; /* 100% Full-height */
+	    width: 0;
+	    position: fixed; /* Stay in place */
+	    z-index: 31; /* Stay on top */
+	    top: 0; /* Stay at the top */	    
+	    background-color: #ffffff;
+	    border: 1px solid #dddddd;
+	    overflow-x: hidden; /* Disable horizontal scroll */	     
+	    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+	}
+	/* Specific sideNav settings */
+	#tocSideNav {
+		left: 0;
+		width: 430px;
+		white-space: nowrap;
+	}
+
+	#attrSideNav {
+	    right: 0;
+	    font-size: 10pt;
+	}
+	/* Margin fix for attribute form */
+	.form-group {
+		margin-bottom: 5px;
+	}  
+
+	/*padding fix for filter dropdowns*/
+	#collapse4 .dropdown {
+		padding-bottom: 10pt;
+	}
+
+	/* When you mouse over the navigation links, change their color */
+	.hamburger:hover {
+	    color: #57585a;
+	    cursor: pointer;
+	    text-decoration: none;
+	}
+
+	/* Position and style the open button for the TOC*/
+	.hamburger {
+	    position: absolute;
+	    left: 18px;
+	    top: 20px;
+	    font-size: 36px;	    
+	    text-decoration: none;
+	    color: #818181;
+	    display: block;
+	    transition: 0.3s;
+	}
+
+	/* Position and style the close button for the TOC*/
+	#closeBtn {
+	    position: absolute;
+	    left: 22px;
+	    top: 30px;
+	    font-size: 24px;	    
+	    text-decoration: none;
+	    color: #818181;
+	    display: block;
+	    transition: 0.3s;
+	    z-index: 32;
+	}
+
+	#closeBtn:hover {
+	    color: #57585a;
+	    cursor: pointer;
+	    text-decoration: none;
+	}
+
+	#clearBtn {
+		display: none;
+		margin-left: 10px;
+	}
+
+	#tableToggle:hover {
+		cursor: pointer;
+	}
+
+	/*Log Off Button*/
+	#logoffButton {
+		position: absolute;
+		left: 15px;
+		bottom: 15px;
+		z-index: 32;
+		display: block;
+	}
+
+	#logoffButton:hover{
+		background-color: #80808038;
+	}	
+
+	/* Template Picker*/
+	#divTemplatePicker {
+		border: none;
+	}
+
+	.templatePicker .dojoxGrid {
+		background-color: transparent;
+		height: 100px;
+		width: 400px;
+	}
+
+	.templatePicker .grid .selectedItem {
+		border: none !important; 
+    	background-color: #80808038 !important;
+    	border-radius: 0px; 
+	}
+
+	/* Style the Status table*/
+	#statusTbl th {
+		font-size: 10pt;
+		white-space: pre-wrap;
+		text-align: center;
+	}
+
+	#statusTbl td {
+		font-size: 12pt;
+		text-align: center;
+	}
+
+	.hover:hover {
+		cursor: pointer;
+		background-color: #80808038;
+	}
+
+	/*Remove border from collapsable panels*/
+	.panel, .panel-group .panel-heading+.panel-collapse>.panel-body{
+		border: none; 		
+	}
+
+	.panel-title {		
+		font-weight: bold;
+		color: dimgray;		
+	}
+
+	.panel-default > .panel-heading {
+		background-color: transparent;
+	}
+
+	.panel-group .panel {
+		border-bottom: 1pt solid #80808038;;
+		border-radius: 0;   	
+	}
+
+	.panel-heading:hover {
+		background-color: #f0f0f0;
+	}
+
+	.panel-title a {
+		text-decoration: none;
+	}
+
+     /* Remove Esri's title from the attachment div since the modal already has a title*/
+   /*  #attachDiv b {
+     	display: none;
+     }*/
+     /* Remove extra line in div*/
+ /*    #attachDiv hr {
+     	display: none;
+     }
+
+     #attachDiv {     	
+     	font-family: helvetica;
+     }	
+*/
+	/*SEARCH************************************************/
+	#search {
+	display: block;
+	position: absolute;
+	z-index: 31;
+	padding-left: 22px;
+	}
+
+	.arcgisSearch .searchMenu .menuHeader{
+	background:#337ab7;
+	}
+	.arcgisSearch .searchMenu li.active {
+	background-color: #337ab7;
+	}
+	.arcgisSearch .searchClear{
+		color:#FFFF00;
+		background-color:#D3D3D3;
+	}
+	.arcgisSearch .searchBtn{
+		padding: 6px 5px;
+	}
+	.arcgisSearch .searchGroup .searchInput{
+		width: 214px;
+	} 
+	.arcgisSearch .searchIcon .esri-icon-down-arrow {
+	color: #000000;
+	}	
+	.arcgisSearch .searchIcon {
+	font-weight: bold;
+	}			
+
+	#formPanel {
+		width: 300px;
+		height: 100%;
+		right: 0;
+	}
+
+	/* MAP********************************************************/
+	#mapDiv{
+	border: 2px solid;
+	border-radius: 5px;
+	border-color: #F8F8F8;
+	height: 100%;
+	width: 100%;
+	left: 0px;
+	z-index: -1;
+	position: absolute;
+	overflow: hidden;
+	}
+
+	.esriSimpleSliderTL{
+		top:20px;
+		left: 97% !important;
+	}
+
+	.HomeButton .home {
+	background-image: url("http://maps.dot.state.tx.us/Images/TexasIcon.png");
+	background-size: 24px 24px;
+	width: 32px;
+	height: 32px;
+	}
+
+	#homeButton {
+	position: absolute;
+	left: 97% !important;
+	top: 90px;
+	z-index: 30;
+	display: block;
+	}
+
+	/* TEMP for displaying analyst names at center of map*/
+	/*#analystDisplay {
+		position: absolute;
+		text-align: left;
+		padding: 0px 10px;
+		color: #337ab7;
+		background-color: rgba(255, 255, 255, 1);
+		border-radius: 5px;
+		width: auto;
+		border: 5px;
+		line-height: 20px;
+		height: auto;
+		left: 20px;
+		bottom: 15px;
+		z-index: 30;
+		display: none;
+	}	*/	
+
+	 /* TABLE***********************************************************/
+	 #tableDiv{
+	  	background-color: #ffffff;	 
+	  	height: auto;
+	    width: auto;
+	    position: fixed;
+	    left: 2px;
+	    bottom: 2px;
+	    right: 2px;
+	    top: 60%;
+	    display: block;
+	    overflow: hidden;
+	 }
+
+	 /*Restyle the Attribute Table (i.e. Feature Table)*/
+
+	 /*Hide the top menu*/
+     .esri-feature-table .esri-feature-table-menu {
+     	background-color: #ffffff;
+		border: none;
+		/*display: none;*/
+     }
+     
+     /* Change default table background colors to white*/
+     .esri-feature-table .dgrid-header {
+     	background-color: #ffffff;
+     }
+
+     /* Change table row colors to white*/
+     .esri-feature-table .dgrid-row-even {
+  		background-color: #f0f0f1;
+     }
+	  .esri-feature-table .dgrid-row-odd {
+         background-color: #ffffff;
+     }
+
+     /* Remove borders around cells*/
+     .esri-feature-table .dgrid-row .dgrid-cell {
+ 		border:	none;
+        border-bottom: 1px solid #dddddd;   keep a bottom border
+     }
+
+     /* Remove cell borders from field headers*/
+     .esri-feature-table .dgrid-header .dgrid-cell {
+         border: none;
+     }
+
+     /*Adjust menu button so that it is not cut off of right side of page*/
+     .esri-feature-table-menu .esri-feature-table-menu-item {
+   	     margin-right: 5px;
+     }
+
+	</style>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://js.arcgis.com/3.24/"></script>
+	
+  </head>
+
+  <body class="tundra">
+	<div class="container-fluid" style="overflow: hidden;">
+
+		<div id="mapDiv">			
+			<div id="homeButton"></div>
+			<!-- <div id="analystDisplay"></div> -->
+		</div>
+
+		<div id="tocSideNav" class="sidenav">
+			<div class=col-sm-1>
+				<span id="closeBtn" class="glyphicon glyphicon-chevron-left"></span>
+			</div>
+			<div style="height: 100%;" class=col-sm-11>
+				<h3 style="padding-left: 15px; padding-top: 10px; padding-bottom: 30px;">Roadway Edits Tracking System</h3>
+				<div id="search"></div>
+				<br>
+				<br>
+  		  		<div style="padding-left: 15px; padding-top: 5px;" class="panel-group" id="accordion">
+				    <div class="panel panel-default">
+				      <div class="panel-heading">
+				        <h4 class="panel-title">
+				          <a data-toggle="collapse"  href="#collapse1">Add a Record</a>
+				        </h4>
+				      </div>
+				      <div id="collapse1" class="panel-collapse collapse in">
+				        <div class="panel-body">
+				          <row> 	
+							<div id="divTemplatePicker"></div> 
+							<button id="clearBtn" type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-remove"></span> Clear Selection</button>
+  		  				  </row>
+  		  				</div>
+				      </div>
+				    </div>
+				    <div class="panel panel-default">
+				      <div class="panel-heading">
+				        <h4 class="panel-title">
+				          <a data-toggle="collapse" href="#collapse2">Basemaps</a>
+				        </h4>
+				      </div>
+				      <div id="collapse2" class="panel-collapse collapse">
+				        <div class="panel-body">
+						  <ul id="basemapList" class="list-group">
+					        <li id="txdotBasemap" class="list-group-item hover">TxDOT</li>
+					        <li id="imageryBasemap" class="list-group-item hover">Imagery</li>
+					      </ul>						
+				        </div>
+				      </div>
+				    </div>
+				    <div class="panel panel-default">
+				      <div class="panel-heading">
+				        <h4 class="panel-title">
+				          <a data-toggle="collapse" href="#collapse3">Statistics</a>
+				        </h4>
+				      </div>
+				      <div id="collapse3" class="panel-collapse collapse">
+				        <div class="panel-body" style="padding-left: 3pt;">				        	
+							<table id="statusTbl" class="table table-hover">
+								<thead>
+								  <tr>
+								    <th>Not Started</th>
+								    <th>In Progress</th>
+								    <th>Complete</th>
+								    <th>Not Ready</th>
+								    <th>On Hold</th>
+								  </tr>
+								</thead>
+								<tbody>
+								  <tr>
+								    <td id="notStarted"></td>
+								    <td id="inProgress"></td>
+								    <td id="complete"></td>
+								    <td id="notReady"></td>
+								    <td id="onHold"></td>
+								  </tr>		      
+								</tbody>
+							</table>
+				        </div>
+				      </div>
+				    </div>
+				    <div class="panel panel-default">
+				      <div class="panel-heading">
+				        <h4 class="panel-title">
+				          <a data-toggle="collapse" href="#collapse4">Filter</a>
+				        </h4>
+				      </div>
+				      <div id="collapse4" class="panel-collapse collapse">
+				        <div class="panel-body">
+						      <div class="dropdown">
+							    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" id="analystBtn" >Select an GIS Analyst
+							    <span class="caret"></span></button>
+							    <ul id="GISAnalystSel" class="dropdown-menu">
+							      <li value="All Analysts"><a href="#GISAnalystSel">All Analysts</a></li>				      
+							    </ul>
+							  </div>
+						      <div class="dropdown">
+							    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" id="GRIDAnalystBtn">Select a GRID Analyst
+							    <span class="caret"></span></button>
+							    <ul id="GRIDAnalystSel" class="dropdown-menu">
+							      <li value="All Analysts"><a href="#GRIDAnalystSel">All Analysts</a></li>
+							    </ul>
+							  </div>  
+						      <div class="dropdown">
+							    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" id="statusBtn" >Select a Status
+							    <span class="caret"></span></button>
+							    <ul id="statusSel" class="dropdown-menu"">
+							      <li value="All Jobs"><a href="#statusSel">All Jobs</a></li>
+							      <li value="Not Started"><a href="#statusSel">Not Started</a></li>
+							      <li value="In Progress"><a href="#statusSel">In Progress</a></li>
+							      <li value="Complete"><a href="#statusSel">Complete</a></li>
+							      <li value="On Hold"><a href="#statusSel">On Hold</a></li>		      
+							      <li value="Not Ready"><a href="#statusSel">Not Ready</a></li>
+							    </ul>
+							  </div>
+						      <div class="dropdown">
+							    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" id="priorityBtn" >Select a Priority
+							    <span class="caret"></span></button>
+							    <ul id="prioritySel" class="dropdown-menu">
+							      <li value="All Priorities"><a href="#prioritySel">All Priorities</a></li>
+							      <li value="Yes"><a href="#prioritySel">Yes</a></li>
+							      <li value="No"><a href="#prioritySel">No</a></li>
+							    </ul>
+							  </div> 
+				        </div>
+				      </div>
+				    </div>				    
+				    <div class="panel panel-default">
+				      <div class="panel-heading">
+				        <h4 class="panel-title">
+				        	<a data-toggle="collapse" href="#collapse5">Table Options</a>
+			        	</h4>
+		        	  </div>
+		        	  <div id="collapse5" class="panel-collapse collapse in">
+				        <div class="panel-body">
+						  <ul class="list-group">
+					        <li id="tableToggle" class="list-group-item hover">Close Table</li>
+					        <li id="tableResizer" class="list-group-item">
+					        	<label class="radio-inline hover"><input type="radio" name="optradio">Small</label>
+								<label class="radio-inline hover"><input type="radio" name="optradio" checked>Medium</label>
+								<label class="radio-inline hover"><input type="radio" name="optradio">Large</label>
+					        </li>
+					      </ul>    
+				        </div>
+				      </div>
+	        	  	</div>
+				</div>						
+			</div>	
+			<button id="logoffButton" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Log Off"><span class="glyphicon glyphicon-off"></span></button>		  			  
+		</div>
+
+		<!-- ATTRIBUTE FORM -->
+		<div id="attrSideNav" class="sidenav">
+		  <div class="col-sm-offset-3 col-sm-8">
+		  	<h3>Attribute Editor</h3>
+  		  </div>
+		  <form id="attrForm" class="form-horizontal" action="/action_page.php">
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="retsIdAttr">RETS ID:</label>
+		      <div class="col-sm-8">
+		        <input type="text" class="form-control" id="retsIdAttr" placeholder="RETS ID (auto-generated)" name="retsIdAttr" value="" disabled>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="rteNameAttr">Route Name:</label>
+		      <div class="col-sm-8">          
+		        <input type="text" class="form-control" id="rteNameAttr" placeholder="Enter Route Name" name="retNameAttr" value="">
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="affctRtesAttr">Affected Routes:</label>
+		      <div class="col-sm-8">          
+		        <input type="text" class="form-control" id="affctRtesAttr" placeholder="Enter Affected Routes" name="affctRtesAttr" value="">
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="mrtNbrAttr">MRT Number:</label>
+		      <div class="col-sm-8">          
+		        <input type="text" class="form-control" id="mrtNbrAttr" placeholder="Enter MRT Number" name="mrtNbrAttr" value="">
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="minOrderAttr">Minute Order:</label>
+		      <div class="col-sm-6">          
+		        <input type="text" class="form-control" id="minOrderAttr" placeholder="Enter Minute Order" name="minOrderAttr" value="">
+		      </div>
+		      <div class="col-sm-2">          
+		        <button id="moBtn" type="button" class="btn btn-default pull-right" data-toggle="tooltip" data-placement="top" title="Look Up Minute Order"><span class="glyphicon glyphicon-link"></span></button>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="statAttr">Status:</label>
+		      <div class="col-sm-8">    
+			      <select class="form-control" id="statAttr" placeholder="Select Status" >
+				    <option value="Not Started">Not Started</option>
+				    <option value="In Progress">In Progress</option>
+				    <option value="Complete">Complete</option>
+				    <option value="Not Ready">Not Ready</option>
+				    <option value="On Hold">On Hold</option>
+				  </select>
+			  </div>
+		  	</div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="priorAttr">Priority:</label>
+		      <div class="col-sm-8"> 
+		        <select class="form-control" id="priorAttr" placeholder="Select Priority" >
+				    <option value="Yes">Yes</option>
+				    <option value="No" selected>No</option>
+				  </select>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="distNmAttr">District Name:</label>
+		      <div class="col-sm-8">          
+		        <input type="text" class="form-control" id="distNmAttr" placeholder="Enter District Name" name="distNmAttr" value="">
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="cntyNmAttr">County Name:</label>
+		      <div class="col-sm-8">          
+		        <input type="text" class="form-control" id="cntyNmAttr" placeholder="Enter County Name" name="cntyNmAttr" value="">
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="gisAnalAttr">GIS Analyst:</label>
+		      <div class="col-sm-8">          
+		        <input type="text" class="form-control" id="gisAnalAttr" placeholder="Enter GIS Analyst" name="gisAnalAttr" value="">
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="gridAnalAttr">GRID Analyst:</label>
+		      <div class="col-sm-8">          
+		        <input type="text" class="form-control" id="gridAnalAttr" placeholder="Enter GRID Analyst" name="gridAnalAttr" value="">
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="distAnalAttr">District Analyst:</label>
+		      <div class="col-sm-8">          
+		        <input type="text" class="form-control" id="distAnalAttr" placeholder="Enter District Analyst" name="distAnalAttr" value="">
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="descAttr">Description:</label>
+		      <div class="col-sm-8">          
+		        <textarea class="form-control" rows="5" id="descAttr" placeholder="Enter a detailed description" name="descAttr" value=""></textarea>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="jobTypeAttr">Job Type:</label>
+		      <div class="col-sm-8"> 
+	           	  <select class="form-control" id="jobTypeAttr">
+				    <option value="Roadway Edit and Asset Update" selected >Roadway Edit and Asset Update</option>
+				    <option value="GRID Asset Job Only">GRID Asset Job Only</option>
+				    <option value="Basemap">Basemap</option>
+				  </select>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="distRvwAttr">District Review:</label>
+		      <div class="col-sm-8"> 
+		          <select class="form-control" id="distRvwAttr">
+				    <option value="Not Started" selected >Not Started</option>
+				    <option value="In Progress">In Progress</option>
+				    <option value="Complete">Complete</option>
+				    <option value="Inapplicable">Inapplicable</option>
+				  </select>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="etlStatAttr">ETL Status:</label>
+		      <div class="col-sm-8"> 
+		          <select class="form-control" id="etlStatAttr">
+				    <option value="Not Started" selected >Not Started</option>
+				    <option value="Complete in GRID Pre">Complete in GRID Pre</option>
+				    <option value="Complete in GRID Prod">Complete in GRID Prod</option>
+				    <option value="Not Applicable - Nothing to ETL">Not Applicable - Nothing to ETL</option>
+				    <option value="Error">Error</option>
+				  </select>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="onSysGridJobAttr">On-System GRID Job:</label>
+		      <div class="col-sm-8">
+		          <select class="form-control" id="onSysGridJobAttr" >
+				    <option value="Not Started" selected >Not Started</option>
+				    <option value="In Progress">In Progress</option>
+				    <option value="Complete">Complete</option>
+				  </select>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="offSysGridJobAttr">Off-System GRID Job:</label>
+		      <div class="col-sm-8"> 
+		          <select class="form-control" id="offSysGridJobAttr">
+				    <option value="Not Started" selected >Not Started</option>
+				    <option value="In Progress">In Progress</option>
+				    <option value="Complete">Complete</option>
+				  </select>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="distGridJobAttr">District GRID Job:</label>
+		      <div class="col-sm-8"> 
+		          <select class="form-control" id="distGridJobAttr">
+				    <option value="Not Started" selected >Not Started</option>
+				    <option value="In Progress">In Progress</option>
+				    <option value="Complete">Complete</option>
+				    <option value="BasInapplicableemap">Inapplicable</option>
+				  </select>				  
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="updateCmntAttr">Update Comments:</label>
+		      <div class="col-sm-8">          
+		        <textarea class="form-control" rows="5" id="updateCmntAttr" placeholder="Enter comments related to your latest update" name="updateCmntAttr" value=""></textarea>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">
+		      <label class="control-label col-sm-3" for="msgAttr">Message:</label>
+		      <div class="col-sm-8">          
+		        <textarea class="form-control" rows="5" id="msgAttr" placeholder="Enter a message for the next analyst" name="msgAttr" value=""></textarea>
+		      </div>
+		    </div>
+		    <div style="padding-left: 5px;"class="form-group">        
+		      <div class="col-sm-offset-3 col-sm-8">
+		        <button type="button" class="btn btn-success" id="saveBtn">Save</button>
+		        <button type="button" class="btn btn-default" id="deleteBtn" data-toggle="modal" data-target="#confirmMod">Delete</button>		        
+		        <button type="button" class="btn btn-default" id="cancelBtn">Cancel</button>		        		        
+		        <button type="button" class="btn btn-default" id="moveBtn"><span class="glyphicon glyphicon-move"> </span> Move</button>
+		        <!-- <button type="button" class="btn btn-default" id="openAttachmentsBtn" data-toggle="modal" data-target="#attachMod"><span class="glyphicon glyphicon-paperclip"></span></button>   --> 
+		      </div>
+		    </div>
+		  </form>
+		</div>
+
+		<span id="openBtn" class="hamburger" >&#9776;</span>			
+		
+		<div id="tableDiv"></div>
+
+		<!-- Modal to confirm deletes -->
+		<div id="confirmMod" class="modal fade" role="dialog">
+		  <div class="modal-dialog">
+
+		    <!-- Modal content-->
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		        <h4 class="modal-title">WARNING!</h4>
+		      </div>
+		      <div class="modal-body">
+		        <p>Are you sure you want to delete this point?</p>
+		      </div>
+		      <div class="modal-footer"> 
+		        <button type="button" class="btn btn-danger" data-dismiss="modal" id="confDelBtn">Delete</button>
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- Modal for attachments -->
+		<div id="attachMod" class="modal fade" role="dialog">
+		  <div class="modal-dialog">
+
+		    <!-- Modal content-->
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		        <h4 class="modal-title">Attachments</h4>
+		      </div>
+		      <div class="modal-body">
+		        <div id="attachDiv"></div>
+		      </div>
+		      <div class="modal-footer"> 
+		        <button type="button" class="btn btn-default" data-dismiss="modal" id="saveAttach">Save</button>
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+	</div>
+
+	<script>
+	require([
+		"esri/map",
+		"esri/layers/VectorTileLayer",
+		"esri/layers/FeatureLayer",
+        "esri/tasks/query", 
+        "esri/tasks/QueryTask",
+
+        "esri/toolbars/draw",
+        "esri/tasks/GeometryService",
+        "esri/dijit/editing/TemplatePicker",        
+        "esri/tasks/QueryTask",
+        "esri/tasks/query",
+
+        "esri/SnappingManager",
+		"esri/symbols/SimpleLineSymbol",
+		"esri/renderers/SimpleRenderer",
+		"esri/Color",
+      	"esri/dijit/FeatureTable",
+
+      	"esri/symbols/SimpleMarkerSymbol",
+      	"esri/symbols/SimpleLineSymbol",
+      	"esri/graphic",
+      	"esri/graphicsUtils",
+      	"esri/dijit/editing/AttachmentEditor",
+
+      	"esri/toolbars/edit",
+      	"esri/dijit/Search",
+		"esri/dijit/HomeButton",
+		"esri/geometry/Point",
+		"esri/dijit/BasemapToggle",
+
+		"esri/basemaps",
+        "esri/layers/WMTSLayer",
+        "esri/layers/WMTSLayerInfo",
+        "esri/arcgis/OAuthInfo",
+        "esri/IdentityManager",
+
+        "esri/symbols/TextSymbol",
+		"esri/symbols/Font",
+		"esri/layers/LabelLayer",
+
+        "dojo/parser",
+        "dojo/_base/array",
+        "dojo/keys",
+        "dojo/Deferred",
+        "dijit/form/Button",
+        "dojo/query",
+        "dojo/dom-construct",
+
+
+		"dojo/domReady!"], function(
+			Map, 
+			VectorTileLayer,
+			FeatureLayer,
+			Query,
+			QueryTask, 
+
+			Draw,
+			GeometryService,			
+            TemplatePicker,
+            QueryTask,
+            Query,
+
+            SnappingManager,
+            SimpleLineSymbol,
+            SimpleRenderer,
+            Color,
+            FeatureTable,
+
+            SimpleMarkerSymbol,
+            SimpleLineSymbol,
+            Graphic,
+            graphicsUtils,
+            AttachmentEditor,
+
+            Edit,
+            Search,
+            HomeButton,
+            Point,
+            BasemapToggle,
+
+            esriBasemaps,
+            WMTSLayer,
+            WMTSLayerInfo,
+            OAuthInfo,
+            IdentityManager,
+
+            TextSymbol,
+            Font,
+            LabelLayer,
+
+            parser,
+            array, 
+            keys,
+            Deferred,
+            Button,
+            query, 
+            domConstruct
+			){
+
+		parser.parse();
+
+	// Start up Identify Manager to handle permissions for layers with TxDOT-only access
+
+          var info = new OAuthInfo({
+                    appId: "mzUb97L38u61Wa4a",
+                    portalUrl: "https://txdot.maps.arcgis.com",
+                    popup: false,
+                    expiration: 720
+                });
+            IdentityManager.registerOAuthInfos([info]);
+            IdentityManager.getCredential(info.portalUrl + "/sharing");				
+
+	// VARIABLES**********************************************************************************************
+
+	  	var distName;
+	  	var cntyName;
+	  	var GISAnalystName;
+	  	var GRIDAnalystName;
+	  	var distAnalystName;
+	  	var routeName;
+	  	var notStarted;
+	  	var inProgress;
+	  	var complete;
+	  	var notReady;
+	  	var onHold;
+	  	var myFeatureTable;
+	  	var targetGraphic;
+	  	var finalExp;
+	  	var stat = '';
+		var prior = '';
+		var assignment = ''; //TEMP
+		var analyst = '';
+		var GRIDAnalyst = '';
+	  	var expArray = [];
+	  	var oID;
+	  	var previousID = '';
+	  	var appVersion = "Version 2.0"
+	  	var GISAnlstDisplay;
+	    var GRIDAnlstDisplay;
+		var DistAnlstDisplay;
+		var templateSelected;
+		var attr;
+		var layerList;
+		var selectedFeatures;
+		var GISAnalystArray = [];
+		var GRIDAnalystArray = [];
+
+	// MAP AND LAYERS*********************************************************************************************
+
+		// Create Map and Basemap..........................................................
+
+		//TxDOT Vector Tile Basemap    
+			var TxDOTVectorTileLayer = new VectorTileLayer("https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer");
+			TxDOTVectorTileLayer.id = "vectorLayer";
+			
+
+			map = new Map("mapDiv", {
+				center: [-99.341389, 31.132222],
+				zoom: 6,
+				logo: false,
+				isDoubleClickZoom: false
+			});
+
+			map.addLayer(TxDOTVectorTileLayer);
+
+		//Set up Google Imagery*******************************
+
+		// Name server with CORS enabled for Google Imagery
+			esri.config.defaults.io.corsEnabledServers.push ("https://txgi.tnris.org");
+
+			// Google Imagery WMTS layer info
+		        var GoogleLayerInfo = new WMTSLayerInfo({
+		          identifier: "texas",
+		          tileMatrixSet: "0to20",
+		          format: "png"
+		        });
+
+		        var GoogleLayerOptions = {
+		          serviceMode: "KVP",
+		          layerInfo: GoogleLayerInfo
+		        };		
+
+				// Add Google Imagery WMTS layer
+		        var google = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);
+		        google.id = "googleLayer";
+
+        // LAYERS*********************************************
+     	
+		// RETS layer
+
+			serviceURL = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadway_Edits_Tracking/FeatureServer/0";
+				// DEV VERSION...........................................................
+				// serviceURL = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadway_Edits_Tracking_DEV/FeatureServer/0";
+			var workflowLyr = new FeatureLayer(serviceURL, {id:"Workflow",visible: true, outFields:["*"]});
+
+			workflowLyr.hasAttachments = true;	
+			map.addLayer(workflowLyr);	
+
+			// set a selection symbol for the featurelayer
+		      	var selectionSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15,
+				    new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+				    new Color([102,255,255, 0.5]),1),
+				    new Color([102,255,255, 1])
+			    );
+			    workflowLyr.setSelectionSymbol(selectionSymbol);
+
+		// District layer used to grab analysts' names for district assignments
+			var queryLyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_RETS_DistCnty_lookup/FeatureServer/0",{id: "Districts", outFields : ["DIST_NM", "GIS_ANLST", "GRID_ANLST", "DIST_ANLST", "CNTY_NM"]});				
+
+		// TxDOT Roadways layer used for snapping and to grab route information
+			var roadwayLyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways/FeatureServer/0",{id: "TxDOT Roadways", outFields : ["*"]});
+			map.addLayer(roadwayLyr);
+			roadwayLyr.advancedQueryCapabilities = {"advancedQueryCapabilities" : {
+		  		"supportsQueryWithDistance" : true, 
+		  		"supportsReturningQueryExtent" : true, 
+		  		"supportsAdvancedQueries" : true,
+			}};
+
+			// Set selection symbol for roadwayLyr
+			// var selectionSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255,255,0,0.5]), 7);
+			// roadwayLyr.setSelectionSymbol(selectionSymbol);		
+
+			// Set renderer for roadwayLyr
+				var theSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([211,211,211,0]),2);
+				var theRenderer = new SimpleRenderer(theSymbol);
+				roadwayLyr.setRenderer(theRenderer);
+
+			// Enable snapping on TxDOT Roadways
+			    map.enableSnapping();
+
+			    var rdwyLayerInfos = [{
+			      layer: roadwayLyr      
+			    }];	    
+
+				var snapManager = new SnappingManager({
+					alwaysSnap: false,
+					snapKey: keys.CTRL,
+					layerInfos: rdwyLayerInfos,
+					tolerance: 200,
+					map: map		
+				});
+
+		// Layer list array
+			layerList = [workflowLyr];		 	
+
+
+		// Call in the AGO geometry service
+		  	var geomServ = new GeometryService("http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+
+  	// WIDGETS********************************************************************************************************
+
+		// Set up Attachment Editor
+			var attachmentEditor = new AttachmentEditor({}, "attachDiv");
+			attachmentEditor.startup();
+
+		// Set up the TEMPLATE PICKER and call in the layers that will be editible
+			var template = new TemplatePicker({
+				columns : 3,
+				emptyMessage: "Hey folks!<br>Templates for adding new points will<br>appear when layer finishes loading.<br>Sure do appreciate for your patience!",
+				grouping : false,
+				showTooltip: false,
+				featureLayers : [workflowLyr]
+			}, "divTemplatePicker");
+			template.startup();
+
+		// Set up the DRAW TOOL used for creating new points
+			var drawToolbar = new Draw(map);
+
+		//  Set up the EDIT TOOL used for moving points
+			var editToolbar = new Edit(map);
+		
+		// Set up the search widget
+	        var search = new Search({            
+	            enableButtonMode: false, //this enables the search widget to display as a single button
+	            enableLabel: false,
+	            enableSuggestions:true,
+	            enableInfoWindow: false,
+	            showInfoWindowOnSelect: false,
+	            allPlaceholder:"City, County, District, Route, CSJ...",
+	            map: map,
+	         }, "search");
+
+
+	         var sources = search.get("sources");
+
+	         sources.push({
+	            featureLayer: new FeatureLayer("https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_City_Boundaries/FeatureServer/0"),          
+	            searchFields: ["CITY_NM"],
+	            displayField: "CITY_NM",
+	            exactMatch: false,
+	            name: "City",
+	            outFields: ["*"],
+	            placeholder: "City",
+	            highlightSymbol: new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),new esri.Color([255,255,255,0.0])),
+	            maxResults: 6,
+	            maxSuggestions: 6,             
+	            enableSuggestions: true,
+	            minCharacters: 0
+	         });
+
+	         sources.push({
+	            featureLayer: new FeatureLayer("https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Control_Sections/FeatureServer/0"),
+	            searchFields: ["CTRL_SECT_LN_NBR"],
+	            displayField: "CTRL_SECT_LN_NBR",
+	            exactMatch: false,
+	            outFields: ["CTRL_SECT_LN_NBR","RTE_RB_NM","BEGIN_MPT","END_MPT"],
+	            name: "Control Section",
+	            placeholder: "001001",
+	            highlightSymbol: new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),
+	            maxResults: 6,
+	            maxSuggestions: 6,
+	            enableSuggestions: true,
+	            minCharacters: 0
+
+	         });
+
+	         sources.push({
+	            featureLayer: new FeatureLayer("https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0"),
+	            searchFields: ["CONTROL_SECT_JOB"],
+	            displayField: "CONTROL_SECT_JOB",
+	            exactMatch: false,
+	            outFields: ["CONTROL_SECT_JOB ","DISTRICT_NUMBER ","LAYMAN_DESCRIPTION1","HIGHWAY_NUMBER"],
+	            name: "Control Section Job (CSJ)",
+	            placeholder: "001001001",
+	            highlightSymbol: new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),
+	            maxResults: 6,
+	            maxSuggestions: 6,
+	            enableSuggestions: true,
+	            minCharacters: 0
+	         });
+
+	         sources.push({
+	            featureLayer: new FeatureLayer("https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_Counties_Detailed/FeatureServer/0"),          
+	            searchFields: ["CNTY_NM"],
+	            displayField: "CNTY_NM",
+	            exactMatch: false,
+	            name: "County",
+	            outFields: ["*"],
+	            placeholder: "County",
+	            highlightSymbol: new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),new esri.Color([255,255,255,0.0])),
+	            maxResults: 6,
+	            maxSuggestions: 6,             
+	            enableSuggestions: true,
+	            minCharacters: 0
+	         });
+
+	         sources.push({
+	            featureLayer: new FeatureLayer("https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Districts/FeatureServer/0"),
+	            searchFields: ["DIST_NM"],
+	            displayField: "DIST_NM",
+	            exactMatch: false,
+	            name: "District",
+	            outFields: ["*"],
+	            placeholder: "District",
+	            highlightSymbol: new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),new esri.Color([255,255,255,0.0])),
+	            maxResults: 6,
+	            maxSuggestions: 6,         
+	            enableSuggestions: true,
+	            minCharacters: 0
+	         });
+
+	        sources.push({
+	            featureLayer: new FeatureLayer("https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Highway_Designations/FeatureServer/0"),
+	            searchFields: ["MO_NBR"],
+	            displayField: "MO_NBR",
+	            exactMatch: false,
+	            name: "Minute Order Number",
+	            outFields: ["*"],
+	            placeholder: "Minute Order Number",
+	            highlightSymbol: new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),
+	            maxResults: 6,
+	            maxSuggestions: 6,           
+	            enableSuggestions: true,
+	            minCharacters: 0
+	         });
+
+	         sources.push({
+	            featureLayer: workflowLyr,
+	            searchFields: ["OBJECTID", "RTE_NM", "GIS_ANLST", "GRID_ANLST"],
+	            displayField: "OBJECTID",
+	            exactMatch: false,
+	            name: "RETS ID",
+	            outFields: ["*"],
+	            placeholder: "Ex: RETS ID, Analyst Names, etc.",
+	            highlightSymbol: new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),
+	            maxResults: 12,
+	            maxSuggestions: 12,            
+	            enableSuggestions: true,
+	            minCharacters: 0
+	         });	 
+
+	         sources.push({
+	            featureLayer: new FeatureLayer("https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways/FeatureServer/0"),
+	            searchFields: ["RTE_RB_NM"],
+	            displayField: "RTE_RB_NM",
+	            exactMatch: false,
+	            name: "Route",
+	            outFields: ["*"],
+	            placeholder: "Ex: IH0035, US0083, SH0079",
+	            highlightSymbol: new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),
+	            maxResults: 12,
+	            maxSuggestions: 12,            
+	            enableSuggestions: true,
+	            minCharacters: 0
+	         });        
+
+	         
+	         sources[0].categories = ["Coordinate System", "Street Name"];
+	         sources[0].placeholder= "-97.745520, 30.257332 or Park Street";
+	         sources[0].name = "Lat/Long or Street Name";
+
+
+	         //Set the sources above to the search widget
+	         search.set("sources", sources);
+	         // search.sources[0].searchExtent = theExtent;
+
+	         search.on("select-result", function(evt) {
+	         	search.set("value", evt.result.name);
+	         });
+	         
+	         search.on("blur",expandSearch);
+
+	         function expandSearch(){
+	         	var x=document.getElementById("search_input");
+	         	if ((x.value).length > 0){
+	         		search.expand();
+	         	}
+	         }
+
+	   	     search.startup();
+
+		// Add Home Button
+			var home = new HomeButton({
+			map: map
+			}, "homeButton");
+			home.startup(); 	
+          	
+
+	// EVENTS.............................................................................
+		
+		// Show tooltip
+			$('[data-toggle="tooltip"]').tooltip();  
+
+		// Open Minute Order link on click of link button
+			$('#moBtn').click(function(){
+				var link = "https://publicdocs.txdot.gov/minord/mosearch/Pages/Minute-Order-Search-Results.aspx#k=" + $('#minOrderAttr').val();				
+				window.open(link, "_target");
+			});
+
+			$('#minOrderAttr').keyup(function(){
+				console.log("keyup!");
+				if(this.value.length > 4){					
+					$('#moBtn').prop('disabled', false);
+				}
+			})
+
+		// Load  FeatureTable and update Status Table once map loads
+	        map.on("load", function(){	        	
+	        	console.log(appVersion);
+	        	loadTable();
+	        	queryStatus();
+	        	// queryAnalystsBasedOnMapCenter(); //TEMP
+	        	console.log("Map on-load event to load attribute table, query the status field for the little status table, and query analysts at center of map");
+        	});	
+
+        	workflowLyr.on("load", function(){
+        		console.log("workflowLyr layer loaded");
+        		// Set cursor to pointer for template picker after workflowLyr 
+        		$(".templatePicker .grid .item").css("cursor", "pointer");
+        	});
+
+		// Select point features and populate attribute form fields
+			workflowLyr.on("click", function(evt){
+			// Track the selected Object IDs
+				console.log(previousID);
+				oID = evt.graphic.attributes.OBJECTID;					
+				console.log(oID);			
+				console.log("workflowLyr clicked");
+
+				// Disable the Minute Order link button Minute Order field is blank
+				if (evt.graphic.attributes.MO_NBR === null | evt.graphic.attributes.MO_NBR === "" ){
+					$('#moBtn').prop('disabled', true);
+				}
+				// Do not rerun query if Move mode is enabled from attribute form
+				if ($('#moveBtn').html() == "Save Move") {
+					console.log("Return: In Move mode");
+					return
+				}
+				// If not in Move mode, select the feature that was clicked on, open the attribute form and populate attribute fields from selected feature
+				else {
+				var workflowLyrQuery = new Query();
+				workflowLyrQuery.objectIds = [oID];
+  				workflowLyr.selectFeatures(workflowLyrQuery,FeatureLayer.SELECTION_NEW, function(x){
+				selectedFeatures = x;
+				console.log("Results from workflowLyrQuery: ", x);
+  				});	
+			// Populate fields in atribute form
+				$('#retsIdAttr').val(evt.graphic.attributes.OBJECTID);
+     	  		$('#rteNameAttr').val(evt.graphic.attributes.RTE_NM);
+				$('#affctRtesAttr').val(evt.graphic.attributes.AFFECT_RTE);
+				$('#mrtNbrAttr').val(evt.graphic.attributes.MRT_NBR);				
+				$('#minOrderAttr').val(evt.graphic.attributes.MO_NBR);
+     	  		$('#statAttr').val(evt.graphic.attributes.STAT);
+     	  		$('#priorAttr').val(evt.graphic.attributes.PRTY);     	  		
+     	  		$('#distNmAttr').val(evt.graphic.attributes.DIST_NM);
+     	  		$('#cntyNmAttr').val(evt.graphic.attributes.CNTY_NM);
+     	  		$('#gisAnalAttr').val(evt.graphic.attributes.GIS_ANLST);
+     	  		$('#gridAnalAttr').val(evt.graphic.attributes.GRID_ANLST);
+     	  		$('#distAnalAttr').val(evt.graphic.attributes.DIST_ANLST);
+     	  		$('#descAttr').val(evt.graphic.attributes.DESC_);
+     	  		$('#jobTypeAttr').val(evt.graphic.attributes.JB_TYPE);
+     	  		$('#distRvwAttr').val(evt.graphic.attributes.DIST_REVW);
+     	  		$('#etlStatAttr').val(evt.graphic.attributes.ETL_STAT);
+     	  		$('#onSysGridJobAttr').val(evt.graphic.attributes.ON_SYS_JOB);
+     	  		$('#offSysGridJobAttr').val(evt.graphic.attributes.OFF_SYS_JOB);
+     	  		$('#distGridJobAttr').val(evt.graphic.attributes.DIST_JOB);
+     	  		$('#updateCmntAttr').val(evt.graphic.attributes.UPDT_CMNT);
+     	  		$('#msgAttr').val(evt.graphic.attributes.MSG);
+ 	  		// Show the attribute sidenav
+				$("#attrSideNav").css("width","500px");
+				}
+			});
+
+		// Move Points
+			$('#moveBtn').click(function(){
+				console.log(selectedFeatures);
+				if ($('#moveBtn').html() == "Save Move") {
+					workflowLyr.applyEdits(null, selectedFeatures, null, function(){
+        			editToolbar.deactivate();
+	            	$('#moveBtn').html("Move");  // $('<span />').attr('class', 'glyphicon glyphicon-move').html(' Move')
+	            	console.log("Saving Move");
+	        	});	
+				}
+				else {
+					$('#moveBtn').html("Save Move");	// $('<span />').attr('class', 'glyphicon glyphicon-move').html(' Save Move')				
+					// Activate Edit Tool
+						editToolbar.activate(Edit.MOVE , selectedFeatures[0]);
+						console.log("Move point activated");
+				}
+			});
+
+		// Clear Template Picker 
+			$("#clearBtn").click(function(){
+				console.log("Template cleared");
+				template.clearSelection();
+				drawToolbar.deactivate();
+				$(this).css("display", "none");
+			});
+
+		// Open & Close attribute table
+			$('#tableToggle').click(function(){
+				console.log("table toggle click");
+				var text = $(this).text();
+				if (text === "Open Table"){
+					$('#tableDiv').css("display", "block");
+					$('#tableToggle').html("Close Table");
+					myFeatureTable.resize();
+				}
+				else if (text === "Close Table"){
+					$('#tableDiv').css("display", "none");
+					$('#tableToggle').html("Open Table");
+					myFeatureTable.resize();
+				}
+			});
+
+		// SHrink & expand attribute table
+			$('.radio-inline').click(function(){
+				console.log("table resizer click");
+				var text = $(this).text();
+				if (text === "Small"){
+					$('#tableDiv').css("top", "80%");
+					myFeatureTable.resize();
+				}
+				if (text === "Medium"){
+					$('#tableDiv').css("top", "60%");
+					myFeatureTable.resize();
+				}
+				else if (text === "Large"){
+					$('#tableDiv').css("top", "40%");
+					myFeatureTable.resize();
+				}
+			});	
+
+		// Set the width of the TOC side navigation
+			$('#openBtn').click(function(){
+				$("#tocSideNav").css("width","430px");
+			    console.log("opening sideNav");	
+			});
+			$('#closeBtn').click(function(){
+				$("#tocSideNav").css("width","0");
+			    console.log("closing sideNav");		
+			});
+
+		// Activate draw toolbar (to enable drawing of points) and also get the value of the selected template to input into attribute form
+			template.on("selection-change", function() {
+				$('#clearBtn').css("display", "block");
+				drawToolbar.activate(Draw.POINT);
+	    		templateSelected = template.getSelected();
+    			console.log(templateSelected);		
+				});	
+
+		// Save edits after drawing point
+			drawToolbar.on("draw-complete", function(evt) {
+            	drawToolbar.deactivate();
+            	editToolbar.deactivate();
+
+    		// Get the geometry & attributes from the event to use for when applying edits, including the Status value from the selected template
+            	var geometry = evt.geometry;       
+        		attr = templateSelected.template.prototype.attributes;
+            	var graphic = new Graphic(geometry, null, attr);
+
+ 	  			workflowLyr.applyEdits([graphic], null, null, function(){
+ 	  				console.log(graphic.attributes.OBJECTID); 
+ 	  				// Immediately select the feature (so it shows up as selected and is filtered in the attribute table) using the Object ID from the graphic
+ 	  				var selQuery = new Query();
+  					selQuery.objectIds = [graphic.attributes.OBJECTID];
+  					console.log(selQuery);
+	  				workflowLyr.selectFeatures(selQuery, FeatureLayer.SELECTION_NEW, function(sel){
+	  					selectedFeatures = sel;
+	  				});
+	  				myFeatureTable.filterRecordsByIds([graphic.attributes.OBJECTID]); 	  			
+
+	            // Set up the basic query for the roadway layer in order to get the route name
+		            var roadwaysQuery = new Query();
+				    roadwaysQuery.units = "feet";
+				    roadwaysQuery.distance = 500;
+				    roadwaysQuery.geometry = geometry;
+
+			    // Get Route Name from TxDOT Roadways
+				  	roadwayLyr.queryFeatures(roadwaysQuery, function (results){
+				  		if (results.features[0] === undefined){
+				  			console.log("No roadway snapped to");
+				  			return;
+				  		}
+				  		else {
+				      		routeName = results.features[0].attributes.RTE_RB_NM;
+				      		console.log(routeName);
+			      		}
+			  		});
+
+			    // Get District, County, and Analyst names from the lookup polygon layer
+				    queryLyr.queryFeatures(roadwaysQuery, populateFields);
+
+					function populateFields(results){
+						console.log(results.features);
+						if (results.features === undefined || results.features.length == 0){
+							$('#retsIdAttr').val(graphic.attributes.OBJECTID);
+			     	  		$('#statAttr').val(attr.STAT);
+			     	  		$('#rteNameAttr').val(routeName);
+							openForm();    	  			
+						}
+						else {
+							console.log("Running Populate Fields function and applying edits to workflowLyr");
+							distName = results.features[0].attributes.DIST_NM;
+							console.log (distName);
+							cntyName = results.features[0].attributes.CNTY_NM;
+							console.log (cntyName);
+							GISAnalystName = results.features[0].attributes.GIS_ANLST;
+							console.log (GISAnalystName);	
+							GRIDAnalystName = results.features[0].attributes.GRID_ANLST;
+							console.log (GRIDAnalystName);	
+							distAnalystName = results.features[0].attributes.DIST_ANLST;
+							console.log (distAnalystName);	
+
+						// insert values from query into attr variable
+							attr["DIST_NM"] = distName;  
+							attr["RTE_NM"] = routeName;   
+							attr["CNTY_NM"] = cntyName;  
+							attr["GIS_ANLST"] = GISAnalystName;  
+							attr["GRID_ANLST"] = GRIDAnalystName;  
+							attr["DIST_ANLST"] = distAnalystName; 
+
+						// Save adds with queried attributes
+			     	  		workflowLyr.applyEdits(null, [graphic], null);     	  		
+
+			     	  	// Insert attribue values into Attribues form on Side Nav
+			     	  		$('#retsIdAttr').val(graphic.attributes.OBJECTID);
+			     	  		$('#statAttr').val(attr.STAT);
+			     	  		$('#rteNameAttr').val(routeName);
+			     	  		$('#distNmAttr').val(distName);
+			     	  		$('#cntyNmAttr').val(cntyName);
+			     	  		$('#gisAnalAttr').val(GISAnalystName);
+			     	  		$('#gridAnalAttr').val(GRIDAnalystName);
+			     	  		$('#distAnalAttr').val(distAnalystName);
+
+			     	  		openForm();
+		     	  		}
+	     	  		}
+
+	     	  		function openForm(){
+		     	  		// Disable the Minute Order link button Minute Order field is blank
+						if (attr.MO_NBR === null){
+							$('#moBtn').prop('disabled', true);
+						}	
+
+		     	  		// Show Atrributes Side Nav
+		     	  		$("#attrSideNav").css("width","500px");
+	     	  		}
+  					
+				}); 
+
+          	}); 
+
+		// Show attachments on-click of attachments button
+			$('#openAttachmentsBtn').click(function(evt){
+				attachmentEditor.showAttachments(evt.graphic,workflowLyr);
+			});
+
+ 
+		// Map on-click event to help with filtering and refreshing table during/after edits
+    		map.on("click", function(clickEvent){
+    			console.log(clickEvent);
+    			// checkTemplateSelection(clickEvent);
+    			console.log("Map click");
+    			// var selectedFeatures2 = workflowLyr.getSelectedFeatures();
+    			// console.log("Array of selected features: ", selectedFeatures);
+    			console.log("oID on map click: ", oID);
+    			var objectIdArray = [oID];
+    			if (previousID !==oID){
+						console.log("New Selection: Running function to filter attribute table by selected features");
+	            		myFeatureTable.filterRecordsByIds([objectIdArray]);
+	            		previousID = oID;
+					}
+					else {
+						console.log("Not a new selection: Not running function to filter attribute table by selected features");					
+					}	
+    		});
+
+
+		// Set cursor to pointer when hovering over a feature in the map
+			array.forEach(layerList, cursorPointer);
+			array.forEach(layerList, cursorDefault);
+
+			function cursorPointer(layer){
+			layer.on("mouse-over", function(){
+			  map.setMapCursor ("pointer");
+			});
+			}
+			function cursorDefault(layer){
+			layer.on("mouse-out", function(){
+			  map.setMapCursor ("default");
+			});
+			}  	
+
+	    // Populate checkboxs from query of workflow layer distinct values
+			var queryTask2 = new QueryTask(serviceURL);  
+			var query2 = new Query();  
+			query2.where = "GRID_ANLST is not null";  // query for non-null values  
+			query2.orderByFields = ["GRID_ANLST"];    // sort it so we won't have to later  
+			query2.returnGeometry = false;          // turn geometry off, required to be false when using 
+			query2.returnDistinctValues = true;  
+			query2.outFields = ["GRID_ANLST"];  
+			queryTask2.execute(query2).then(GRIDanalist);
+
+			function GRIDanalist (results){
+			for (var i=0;i<results.features.length;i++){
+				var gridanalist = results.features[i].attributes.GRID_ANLST;
+				GRIDAnalystArray.push(gridanalist);
+				}
+
+        	$.each(GRIDAnalystArray,function(){
+            	var listItem = document.createElement('li');
+            	$('#GRIDAnalystSel').append($(listItem).attr('value',this).html("<a href='#GRIDAnalystSel'>"+ this +"</a>"));
+        	}); 
+
+		 	$("#GRIDAnalystSel li").click(function(){	
+	 		  $("#GRIDAnalystBtn").text($(this).text());	
+		      var text = $(this).text();
+		      console.log(text);
+		      filterGRIDAnalyst(text);
+			});
+				};
+  
+        	// query distinct use code values from parcels  
+			var queryTask = new QueryTask(serviceURL);
+			var query = new Query();  
+			query.where = "GIS_ANLST is not null";  // query for non-null values  
+			query.orderByFields = ["GIS_ANLST"];    // sort it so we won't have to later  
+			query.returnGeometry = false;          // turn geometry off, required to be false when using 
+			query.returnDistinctValues = true;  
+			query.outFields = ["GIS_ANLST"];  
+			queryTask.execute(query).then(GISanalist);
+
+			function GISanalist (results){
+				console.log(results);
+			for (var i=0;i<results.features.length;i++){
+				var analist = results.features[i].attributes.GIS_ANLST;
+				GISAnalystArray.push(analist);
+			}
+
+				$.each(GISAnalystArray,function(){
+            	var listItem = document.createElement('li');
+            	$('#GISAnalystSel').append($(listItem).attr('value',this).html("<a href='#GRIDAnalystSel'>"+ this +"</a>"));
+        	});
+				
+				$("#GISAnalystSel li").click(function(){
+			 	console.log(GISAnalystArray);
+	 			$("#analystBtn").text($(this).text());
+		      	var text = $(this).text();
+		      	console.log(text);
+		      	filterAnalyst(text);
+			}); 
+			};
+
+        // Begin TEMP Assignment Filter...........................................................................................
+
+	   //      	var assignmentArray = [
+	   //      		"Brian Alt",
+				// 	"Chris Bardash",
+				// 	"Richard Barrientos",
+				// 	"Nicole Beecher",
+				// 	"Sam Bogle",
+				// 	"Jason Ferrell",
+				// 	"Eric Kinsey",
+				// 	"Jessica Lane",
+				// 	"Tom Neville",
+				// 	"John Phillips",
+				// 	"Grace Richey",
+				// 	"Jeremy Rogers",
+				// 	"Stephen Ross",
+				// 	"Travis Scruggs",
+				// 	"Matt Washburn",
+				// 	"George Sosa",
+				// 	"Joel Campbell"
+	   //      	];
+	   //      	$.each(assignmentArray,function(){
+	   //          	var listItem = document.createElement('li');
+	   //          	$('#assignmentSel').append($(listItem).attr('value',this).html("<a href='#assignmentSel'>"+ this +"</a>"));
+	   //      	});  
+
+	   //  	// Get the value of the Assignment dropdown menu for workflowLyr definition query
+			 // 	$("#assignmentSel li").click(function(){
+		 	// 	  $("#assignmentBtn").text($(this).text());
+			 //      var text = $(this).text();
+			 //      console.log(text);
+			 //      filterAssignment(text);
+				// });  
+
+		// End TEMP Assignment Filter...........................................................................................
+
+        // Get the value of the Analyst dropdown menu for workflowLyr definition query
+		 	$("#GISAnalystSel li").click(function(){
+	 		  $("#analystBtn").text($(this).text());
+		      var text = $(this).text();
+		      console.log(text);
+		      filterAnalyst(text);
+			});  
+
+		// Get the value of the GRID Analyst dropdown menu for workflowLyr definition query
+		 	$("#GRIDAnalystSel li").click(function(){		 	  
+	 		  $("#GRIDAnalystBtn").text($(this).text());	
+		      var text = $(this).text();
+		      console.log(text);
+		      filterGRIDAnalyst(text);
+			});  
+
+        // Get the value of the Status dropdown menu for workflowLyr definition query
+		 	$("#statusSel li").click(function(){
+	 		  $("#statusBtn").text($(this).text());
+		      var text = $(this).text();
+		      console.log(text);
+		      filterStatus(text);
+			});
+
+		// Get the value of the Priority dropdown menu for workflowLyr definition query
+		 	$("#prioritySel li").click(function(){
+	 		  $("#priorityBtn").text($(this).text());		 		
+		      var text = $(this).text();
+		      console.log(text);
+		      filterPriority(text);
+			});  
+
+		// Use the selected value of the dropdown to fire query to use for Status Table
+			$("#analystBtn" ).change(function() {
+ 		 		alert( "Handler for .change() called." );
+			});
+
+		// On click event to switch basemaps
+			$("#basemapList li").click(function(){				
+				var text = $(this).text();
+				console.log(text);
+				if (text  === "Imagery"){
+					console.log("Switching to Google Imagery");
+					map.removeLayer(TxDOTVectorTileLayer);
+					map.addLayer(google);
+				}
+				if (text === "TxDOT"){
+					console.log("Switching to TxDOT basemap");
+					map.removeLayer(google);
+					map.addLayer(TxDOTVectorTileLayer);
+				}
+			});
+
+		// Logoff
+			$('#logoffButton').click(function() {
+	            IdentityManager.destroyCredentials();
+	            location.reload(true);
+	            console.log("Logoff and reload");
+	       });
+
+		// Save edits
+			$('#saveBtn').click(function (){
+				saveEdits();
+			});
+
+		// Delete edits
+			$('#confDelBtn').click(function (){
+				deleteEdits();
+			});	
+
+		// Cancel edits
+			$('#cancelBtn').click(function (){
+				if (templateSelected !== undefined) {
+					console.log(selectedFeatures);
+					console.log("Add point in progress");
+            		workflowLyr.applyEdits(null, null, selectedFeatures, function(){
+            			console.log("Deleting added points after cancel");
+            			$('#moveBtn').html("Move");
+						workflowLyr.clearSelection();
+		            	workflowLyr.refresh();
+		            	myFeatureTable.clearFilter(); 
+		    			myFeatureTable.refresh();
+		    			drawToolbar.deactivate();
+		    			editToolbar.deactivate();
+		    			template.clearSelection();
+		    			$('#clearBtn').css("display", "none");
+						$("#attrSideNav").css("width","0");
+		            	$("#attrForm").trigger("reset");
+            		});
+            	}
+            	else {
+					console.log("Cancelled");
+					$('#moveBtn').html("Move");
+					workflowLyr.clearSelection();
+	            	workflowLyr.refresh();
+	            	myFeatureTable.clearFilter(); 
+	    			myFeatureTable.refresh();
+	    			editToolbar.deactivate();
+					$("#attrSideNav").css("width","0");
+	            	$("#attrForm").trigger("reset");
+            	}
+			});	
+
+
+		// Get analysts at center of map when the extent changes
+			// map.on("extent-change", queryAnalystsBasedOnMapCenter);
+
+			
+
+
+    // FUNCTIONS..........................................................................
+
+    	// Query for analysts at center of map when the extent changes
+   //  		function queryAnalystsBasedOnMapCenter(evt){
+			// 	center = map.extent.getCenter();
+			// 	// console.log(center);
+			// 	query = new Query();
+			//     query.geometry = center;
+
+			//   	queryLyr.queryFeatures(query, function (results){
+			//       GISAnlstDisplay= results.features[0].attributes.GIS_ANLST;
+			//       GRIDAnlstDisplay = results.features[0].attributes.GRID_ANLST;
+			//       DistAnlstDisplay = results.features[0].attributes.DIST_ANLST;
+			//       // console.log(GISAnlstDisplay);
+			//       // console.log(GRIDAnlstDisplay);
+			//       // console.log(DistAnlstDisplay);
+			//       if (GISAnlstDisplay === undefined){
+			//       	dojo.query("#analystDisplay").style("display", "none");
+			//       }
+			//       else {
+			//       document.getElementById("analystDisplay").innerHTML = "<span style='text-decoration: underline;''>" + "Analysts based on map center:" + "</span>" + "<br />" + "GIS Analyst: " + GISAnlstDisplay + "<br />" + "     GRID Analyst: " + GRIDAnlstDisplay + "<br />" + "     District Analyst: " + DistAnlstDisplay;
+			//       dojo.query("#analystDisplay").style("display", "block");
+			//   	  }	
+			//     });
+			// }
+
+    	// Save Edits when Save button is clicked
+    	 	function saveEdits(){
+	            console.log("Saving edits"); 
+            // Populate the graphic's attributes with any new values from the form
+    	 		console.log(selectedFeatures);
+    	 		selectedFeatures[0].attributes.RTE_NM = $('#rteNameAttr').val();
+    	 		selectedFeatures[0].attributes.AFFECT_RTE = $('#affctRtesAttr').val();
+    	 		selectedFeatures[0].attributes.MRT_NBR = $('#mrtNbrAttr').val();
+    	 		selectedFeatures[0].attributes.MO_NBR = $('#minOrderAttr').val();
+    	 		selectedFeatures[0].attributes.STAT = $('#statAttr').val();
+    	 		selectedFeatures[0].attributes.PRTY = $('#priorAttr').val();
+    	 		selectedFeatures[0].attributes.DIST_NM = $('#distNmAttr').val();
+    	 		selectedFeatures[0].attributes.CNTY_NM = $('#cntyNmAttr').val();
+    	 		selectedFeatures[0].attributes.GIS_ANLST = $('#gisAnalAttr').val();
+    	 		selectedFeatures[0].attributes.GRID_ANLST = $('#gridAnalAttr').val();
+    	 		selectedFeatures[0].attributes.DIST_ANLST = $('#distAnalAttr').val();
+    	 		selectedFeatures[0].attributes.DESC_ = $('#descAttr').val();
+    	 		selectedFeatures[0].attributes.JB_TYPE = $('#jobTypeAttr').val();
+    	 		selectedFeatures[0].attributes.DIST_REVW = $('#distRvwAttr').val();
+    	 		selectedFeatures[0].attributes.ETL_STAT = $('#etlStatAttr').val();
+    	 		selectedFeatures[0].attributes.ON_SYS_JOB = $('#onSysGridJobAttr').val();
+    	 		selectedFeatures[0].attributes.OFF_SYS_JOB = $('#offSysGridJobAttr').val();
+    	 		selectedFeatures[0].attributes.DIST_JOB = $('#distGridJobAttr').val();
+    	 		selectedFeatures[0].attributes.UPDT_CMNT = $('#updateCmntAttr').val();
+    	 		selectedFeatures[0].attributes.MSG = $('#msgAttr').val();
+	 		// Apply edits 
+	 			workflowLyr.applyEdits(null, selectedFeatures, null, function(){
+	 				workflowLyr.clearSelection();
+	            	workflowLyr.refresh();
+	            	myFeatureTable.clearFilter(); 
+        			myFeatureTable.refresh();
+        			template.clearSelection();
+        			drawToolbar.deactivate();
+        			editToolbar.deactivate();
+	           		queryStatus();	            
+					$("#attrSideNav").css("width","0");
+	            	$("#attrForm").trigger("reset");				
+					$('#moveBtn').html("Move");
+					$('#moBtn').prop('disabled', false);
+					$('#clearBtn').css("display", "none");
+	        	});	
+ 			}
+
+	        function deleteEdits(){
+	        	workflowLyr.applyEdits(null, null, selectedFeatures, function(){       			
+        			template.clearSelection();
+	        		editToolbar.deactivate();
+        			drawToolbar.deactivate(); 
+	 				workflowLyr.clearSelection();
+	            	workflowLyr.refresh();
+	            	myFeatureTable.clearFilter(); 
+        			myFeatureTable.refresh();
+	           		queryStatus();	            
+					$("#attrSideNav").css("width","0");
+	            	$("#attrForm").trigger("reset");
+					$('#moveBtn').html("Move");
+					$('#clearBtn').css("display", "none");
+	 			});        	  	
+	        }
+
+    	
+
+    	// Build attribute table
+
+	    	function loadTable(){
+	    		console.log("Running Load Table function to build attribute table");
+	    		$('#tableDiv').css("display", "block");
+			   	workflowLyr.setSelectionSymbol(selectionSymbol);
+
+			   	tableFieldInfos = [
+			   		{
+					    name: "OBJECTID",
+					    alias: "RETS ID",
+					    editable: false,
+					    visible: true
+					},
+			   	
+			   	];
+
+          		//create new FeatureTable and set its properties 
+	          	myFeatureTable = new FeatureTable({
+		            featureLayer : workflowLyr,
+		            map : map, 
+		            editable: true,
+		            fieldInfos: tableFieldInfos,
+		            syncSelection: true,
+		            dateOptions: {
+		              datePattern: 'M/d/y', 
+		              timeEnabled: true,
+		              timePattern: 'H:mm',
+		            },
+		            showAttachments: true,
+          		}, 
+          		'tableDiv'
+          		);
+
+				myFeatureTable.startup();
+				myFeatureTable.filterSelectedRecords(true);
+
+				// Sort table on load
+				myFeatureTable.on("load", function(evt){
+					console.log("Sorting Attribute Table on load event");
+					myFeatureTable.sort("OBJECTID", true);
+				});
+
+		    	// Zoom to record when a row is selected from the table & get RTE_NM from selected record to use to select roadway segment and highlight
+				myFeatureTable.on("row-select", function(evt){
+					myFeatureTable.centerOnSelection(); 
+					// Select line from roadwayLyr
+					// console.log(evt);
+					// var route = evt.rows[0].data.RTE_NM; 
+					// console.log(route);
+					// var defExp = "RTE_NM = " + "'" + route + "'";
+					// console.log(defExp);
+					// routeQuery = new Query();
+					// routeQuery.where = defExp;
+					// // Test to see if selectFeatures works NEED TO RETURN TO THIS TO FIX, IN ORDER TO HIGHLIGHT ROUTE
+					// roadwayLyr.selectFeatures(routeQuery, FeatureLayer.SELECTION_NEW), function(){console.log("worked!")}, function(){console.log("ain't work!")};
+					// console.log(roadwayLyr.getSelectedFeatures());
+				}); 
+
+	    	}
+	 
+		// Definition Query to filter workflow layer based on dropdown selections
+			// Begin TEMP Assignment filter..................................
+				// function filterAssignment (value){
+				// 	console.log(value);			
+				// 	if (value == "All Assignments") {
+			 //       		assignment ="";	
+				// 	}
+				// 	else {
+				// 		assignment = "Assignment = '" + value + "'";
+				// 	}
+				// 	console.log(assignment);
+				// 	buildDefExp();
+				// }
+			// End TEMP Assignment filter..................................
+
+			function filterAnalyst (value){
+				console.log(value);			
+				if (value == "All Analysts") {
+		       		analyst ="";	
+				}
+				else {
+					analyst = "GIS_ANLST = '" + value + "'";
+				}
+				console.log(analyst);
+				buildDefExp();
+			}
+
+			function filterGRIDAnalyst (value){
+				console.log(value);			
+				if (value == "All Analysts") {
+		       		GRIDAnalyst ="";	
+				}
+				else {
+					GRIDAnalyst = "GRID_ANLST = '" + value + "'";
+				}
+				console.log(GRIDAnalyst);
+				buildDefExp();
+			}
+
+			function filterStatus (value){
+				console.log(value);			
+				if (value == "All Jobs") {
+		       		stat ="";	
+				}	
+				else {
+					stat = "STAT = '" + value + "'";
+				}
+				console.log(stat);
+				buildDefExp();
+			}
+
+			function filterPriority (value){
+				console.log(value);			
+				if (value == "All Priorities") {
+		       		prior ="";	
+				}	
+				else {
+					prior = "PRTY = '" + value + "'";
+				}
+				console.log(prior);
+				buildDefExp();
+			}
+
+			function buildDefExp(exp){
+				console.log("Running Build Definition Expression function");				
+				console.log(GRIDAnalyst);
+				console.log(analyst);
+				console.log(prior);
+				console.log(stat);
+				console.log(assignment); //TEMP
+				expArray =[];
+				// TEMP Assignment filter
+				// if (assignment !== ""){
+				// 	expArray.push(assignment);
+				// }
+				// End TEMP Assignment filter
+				if (analyst !== ""){
+					expArray.push(analyst);
+				}
+				if (GRIDAnalyst !== ""){
+					expArray.push(GRIDAnalyst);
+				}
+				if (prior !== ""){
+					expArray.push(prior);
+				}
+				if (stat !== ""){
+					expArray.push(stat);
+				}
+				// console.log(exp);
+				console.log(expArray);	
+
+				finalExp = "";
+				var counter = 1;
+
+				array.forEach(expArray, function(item){
+					if (counter == 1){
+				        finalExp += item;
+				        counter +=1;
+			        }
+				    else{
+				        finalExp += " AND " + item;
+				        counter +=1;
+					}
+				});
+
+				setDefExp(finalExp);
+				console.log(finalExp);
+				queryStatus();				
+			}
+
+			function setDefExp(exp){
+				console.log("Running Set Definition Expression function");
+				workflowLyr.setDefinitionExpression(exp);	
+				console.log(exp);
+				myFeatureTable.refresh();
+
+				// Following is a bunch of bullshit workaround because the graphicsUtils.getExtent methods doesn't work
+				var query = new Query();  
+				query.where = "1=1";    
+				workflowLyr.queryFeatures(query, function (featureSet) {  
+					console.log(featureSet);
+				    var data = [];  
+				    if (featureSet && featureSet.features && featureSet.features.length > 0) {  
+				        data = featureSet.features;  
+				    }  
+				    console.log(data);
+				    var zoomExtent = esri.graphicsExtent(data); 
+				    console.log(zoomExtent); 
+				    map.setExtent(zoomExtent, true);  
+				});	
+			}
+
+
+		// Query workflowLyr for Status and update Status Table
+
+			function queryStatus(){
+				console.log("Running Query Status function to get status numbers for little table");
+				var notStartedQuery = new Query();
+				notStartedQuery.where = "STAT = 'Not Started'";
+				workflowLyr.queryCount(notStartedQuery, function(count) {
+				notStarted = count;
+				document.getElementById("notStarted").innerHTML = notStarted;
+				}, function(error) {
+				console.log(error);
+				}); 
+
+				var inProgressQuery = new Query();
+				inProgressQuery.where = "STAT = 'In Progress'";
+				workflowLyr.queryCount(inProgressQuery, function(count) {
+				inProgress = count;
+				document.getElementById("inProgress").innerHTML = inProgress;
+				}, function(error) {
+				console.log(error);
+				}); 
+
+				var completeQuery = new Query();
+				completeQuery.where = "STAT = 'Complete'";
+				workflowLyr.queryCount(completeQuery, function(count) {
+				complete = count;
+				document.getElementById("complete").innerHTML = complete;
+				}, function(error) {
+				console.log(error);
+				}); 
+
+				var notReadyQuery = new Query();
+				notReadyQuery.where = "STAT = 'Not Ready'";
+				workflowLyr.queryCount(notReadyQuery, function(count) {
+				notReady = count;
+				document.getElementById("notReady").innerHTML = notReady;
+				}, function(error) {
+				console.log(error);
+				}); 
+
+				var onHoldQuery = new Query();
+				onHoldQuery.where = "STAT = 'On Hold'";
+				workflowLyr.queryCount(onHoldQuery, function(count) {
+				onHold = count;
+				document.getElementById("onHold").innerHTML = onHold;
+				}, function(error) {
+				console.log(error);
+				}); 
+			}
+	});
+
+		</script>
+
+  </body>
+</html>
